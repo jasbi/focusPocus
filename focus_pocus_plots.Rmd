@@ -1,0 +1,206 @@
+---
+title: "Template Plots"
+author: "Masoud Jasbi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r packages, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+# Load Tidy Data
+
+```{r loadTidyData}
+tidy_data <- read_csv("tidydata_toy.csv")
+```
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+
+# Load the dataset
+data <- read.csv("tidydata_toy.csv")
+
+# Categorize questions into groups
+data$question_group <- case_when(
+  grepl("^Control", data$question) ~ "1_Control",
+  grepl("^not_and_", data$question) ~ "2_Not_And",
+  grepl("^not_or_", data$question) ~ "3_Not_Or",
+  TRUE ~ "4_Other"
+)
+
+# Reorganize rows: Control first, then Not_And, then Not_Or, then Other
+data_reordered <- data %>%
+  arrange(question_group)
+
+# Save the reordered dataset
+write.csv(data_reordered, "tidydata_fully_reordered.csv", row.names = FALSE)
+```
+
+# Exploratory Plots
+
+```{r}
+ggplot(tidy_data, aes(factor(question), response)) + 
+  geom_dotplot(binaxis = "y", stackdir = "down", binwidth = 0.01) +
+  theme_classic()
+```
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(stringr)
+
+# Load the dataset
+data <- read.csv("tidydata_toy.csv")
+
+# Extract the number from the question (assuming it's always the last 3 digits)
+data$question_number <- as.numeric(str_extract(data$question, "\\d{3}$"))
+
+# Categorize questions into groups
+data$question_group <- case_when(
+  grepl("^Control", data$question) ~ "1_Control",
+  grepl("^not_and_", data$question) ~ "2_Not_And",
+  grepl("^not_or_", data$question) ~ "3_Not_Or",
+  TRUE ~ "4_Other"
+)
+
+# Reorganize rows: Control first, then Not_And by number, then Not_Or by number, then Other
+data_reordered <- data %>%
+  arrange(question_group, case_when(
+    question_group == "2_Not_And" ~ question_number, 
+    question_group == "3_Not_Or" ~ question_number,
+    TRUE ~ 0 
+  ))
+
+# Save the reordered dataset
+write.csv(data_reordered, "tidydata_fully_reordered.csv", row.names = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(stringr)
+
+# Load your data
+data <- read.csv("tidydata_fully_reordered.csv")
+
+# Extract the question number (assuming it's the last 3 digits)
+data$question_number <- as.numeric(str_extract(data$question, "\\d{3}$"))
+
+# Filter out "Control" group
+data <- data %>% 
+  filter(question_group != "1_Control")
+
+# Create a new grouping variable 
+data <- data %>%
+  mutate(group_combined = case_when(
+    question_group == "3_Not_Or" & question_number %in% c(1, 2, 3) ~ "NOT_or",
+    question_group == "3_Not_Or" ~ "not_OR",
+    question_group == "2_Not_And" & question_number %in% c(1, 2, 3) ~ "NOT_and",
+    question_group == "2_Not_And" ~ "not_AND",
+    TRUE ~ question_group 
+  ))
+
+# Calculate proportions
+data_summary <- data %>%
+  group_by(group_combined, response) %>%
+  summarize(count = n()) %>%
+  mutate(proportion = count / sum(count))
+
+# Create the stacked bar plot
+ggplot(data_summary, aes(x = group_combined, 
+                        y = proportion, 
+                        fill = as.factor(response))) + 
+  geom_bar(stat = "identity") +
+  labs(x = "Question Group", 
+       y = "Proportion of Responses", 
+       fill = "Response") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(patchwork) 
+
+# Load your data
+data <- read.csv("tidydata_fully_reordered.csv")
+
+# Extract the question number (assuming it's the last 3 digits)
+data$question_number <- as.numeric(str_extract(data$question, "\\d{3}$"))
+
+# Filter out "Control" group
+data <- data %>% 
+  filter(question_group != "1_Control")
+
+# Create a new grouping variable 
+data <- data %>%
+  mutate(group_combined = case_when(
+    question_group == "3_Not_Or" & question_number %in% c(1, 2, 3) ~ "3_Not_Or_123",
+    question_group == "3_Not_Or" ~ "3_Not_Or_Other",
+    question_group == "2_Not_And" & question_number %in% c(1, 2, 3) ~ "2_Not_And_123",
+    question_group == "2_Not_And" ~ "2_Not_And_Other",
+    TRUE ~ question_group 
+  ))
+
+# Create a function to generate a single plot
+create_plot <- function(group_name) {
+  data_subset <- data %>% 
+    filter(group_combined == group_name) 
+  
+  data_summary <- data_subset %>%
+    group_by(response) %>%
+    summarize(count = n()) %>%
+    mutate(proportion = count / sum(count))
+  
+  ggplot(data_summary, aes(x = "", y = proportion, fill = as.factor(response))) + 
+    geom_bar(stat = "identity", width = 1) + 
+    labs(title = group_name, 
+         y = "Proportion of Responses", 
+         fill = "Response") +
+    coord_polar(theta = "y") + 
+    theme_void() 
+}
+
+# Generate plots for each group
+plot1 <- create_plot("2_Not_And_123")
+plot2 <- create_plot("2_Not_And_Other")
+plot3 <- create_plot("3_Not_Or_123")
+plot4 <- create_plot("3_Not_Or_Other")
+
+# Arrange and display the plots
+plot1 + plot2 + plot3 + plot4
+
+```
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Load the dataset
+data <- read.csv("tidydata_fully_reordered.csv")
+
+# Filter for Control questions (using grepl for pattern matching)
+control_data <- data %>%
+  filter(grepl("^Control", question)) 
+
+# Calculate proportions for Control questions
+control_summary <- control_data %>%
+  group_by(question, response) %>% 
+  summarize(count = n()) %>%
+  mutate(proportion = count / sum(count))
+
+# Create a bar plot for Control questions with grouped bars
+control_plot <- ggplot(control_summary, aes(x = question, y = proportion, fill = as.factor(response))) +
+  geom_bar(stat = "identity") + 
+  labs(title = "Control Questions", x = "Question", y = "Proportion of Responses", fill = "Response") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+# Display the plot
+print(control_plot)
+```
+

@@ -1,0 +1,72 @@
+---
+title: "Data Wrangling"
+author: "Masoud Jasbi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+This first chunk of code loads all the packages we need for data wrangling.
+
+```{r packages, include=FALSE}
+library(tidyverse)
+```
+
+# Loading and Inspecting the Data
+
+Here we first import the data collected on some platform (e.g. Qualtrics) into R and save it in a variable named `r raw_data`. 
+
+```{r loadRawData}
+raw_data <- read_csv("toy_data.csv")
+```
+
+# Removing Useless Columns or Rows
+
+In the template data, we have a first row that repeats column names and a second row that has additional test we don't want to use. We are going to remove these two rows. We are going to also remove the following columns that we don't intend to use: StartDate, EndDate, Status, IPAddress, Progress, RecordedDate, RecipientLastName, RecipientFirstName, RecipientEmail, ExternalReference, LocationLatitude, LocationLongitude.
+
+```{r}
+removed_data <- 
+  raw_data[-c(1:2),] %>% #removing the first two rows
+  select(-StartDate, -EndDate, -Status, -IPAddress, -Progress, -RecordedDate, -RecipientLastName, -RecipientFirstName, -RecipientEmail, -ExternalReference, -LocationLatitude, -LocationLongitude) #removing colunns we don't need
+```
+
+# Exclusions
+
+Here we explain the exclusion criteria for this study. We first removed participants that did not finish the task. We also removed preview runs of the study that were not actual participants providing the data but rather researchers testing the study.
+
+```{r}
+excluded_data <-
+  removed_data %>%
+  filter(Finished==1) %>% # removing participants that did not finish the task
+  filter(DistributionChannel!="preview") %>% # removing trials that were preview trials
+  select(-Finished, -DistributionChannel)
+```
+
+You can add more exclusions here but you need to be very specific and justify each exclusion criterion.
+
+How many subjects were excluded and why?
+
+```{r}
+exclusions <-
+  removed_data %>%
+  filter(Finished==0 | DistributionChannel=="preview") # removing participants that did not finish the task
+```
+
+# Reshaping the data into Tidy Form
+```{r}
+cat("c(", paste(names(removed_data), collapse = ","), ",)\n")
+```
+
+
+```{r}
+tidy_data <-
+  excluded_data %>%
+  gather("question", "response", c(Control_no_animals_1,Control_one_animal_1,Control_two_animals...21,not_and_cb_001,Control_two_animals...23,not_or_ed_001,Control_only_cat...25,not_and_dc_002,Control_two_animals...27,not_and_ed_003,Control_has_cat_dog,not_or_cb_002,Control_only_cat...31,not_or_cb_102,not_or_cd_003,not_or_ed_101,not_and_cb_101,not_or_cd_103,Control_two_animals...37,not_and_ed_103,Control_no_animals,not_and_dc_102))
+```
+
+# Saving the Tidy Data
+
+Here we save the data that is reading for ploting and statistical analyses.
+
+```{r}
+write_csv(tidy_data, "tidydata_toy.csv")
+```
