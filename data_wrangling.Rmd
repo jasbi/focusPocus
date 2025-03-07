@@ -52,15 +52,11 @@ exclusions <-
 ```
 
 # Reshaping the data into Tidy Form
-```{r}
-cat("c(", paste(names(removed_data), collapse = ","), ",)\n")
-```
-
 
 ```{r}
 tidy_data <-
   excluded_data %>%
-  gather("question", "response", c(Control_no_animals_1,Control_one_animal_1,Control_two_animals...21,not_and_cb_001,Control_two_animals...23,not_or_ed_001,Control_only_cat...25,not_and_dc_002,Control_two_animals...27,not_and_ed_003,Control_has_cat_dog,not_or_cb_002,Control_only_cat...31,not_or_cb_102,not_or_cd_003,not_or_ed_101,not_and_cb_101,not_or_cd_103,Control_two_animals...37,not_and_ed_103,Control_no_animals,not_and_dc_102))
+  gather("question", "response", Control_no_animals_1:not_and_dc_102)
 ```
 
 # Saving the Tidy Data

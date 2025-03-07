@@ -8,6 +8,7 @@ output: pdf_document
 ```{r packages, include=FALSE}
 library(tidyverse)
 library(ggplot2)
+
 ```
 
 # Load Tidy Data
@@ -16,10 +17,11 @@ library(ggplot2)
 tidy_data <- read_csv("tidydata_toy.csv")
 ```
 
-```{r}
-# Load necessary libraries
-library(dplyr)
+Try to use the function separate() to divide a column with a complex name into more columns with names that are smaller parts of that complex name: https://tidyr.tidyverse.org/reference/separate.html
 
+
+```{r}
+#### NO NEED TO READ THE DATA AGAIN HERE
 # Load the dataset
 data <- read.csv("tidydata_toy.csv")
 
@@ -31,6 +33,7 @@ data$question_group <- case_when(
   TRUE ~ "4_Other"
 )
 
+## NO NEED TO REORGANIZE ROWS. GENERALLY NOTHING IS ORDERED IN A DATAFRAME
 # Reorganize rows: Control first, then Not_And, then Not_Or, then Other
 data_reordered <- data %>%
   arrange(question_group)
@@ -41,11 +44,8 @@ write.csv(data_reordered, "tidydata_fully_reordered.csv", row.names = FALSE)
 
 # Exploratory Plots
 
-```{r}
-ggplot(tidy_data, aes(factor(question), response)) + 
-  geom_dotplot(binaxis = "y", stackdir = "down", binwidth = 0.01) +
-  theme_classic()
-```
+Masoud: Probably no need for the chunk below
+
 ```{r}
 # Load necessary libraries
 library(dplyr)
@@ -76,6 +76,11 @@ data_reordered <- data %>%
 # Save the reordered dataset
 write.csv(data_reordered, "tidydata_fully_reordered.csv", row.names = FALSE)
 ```
+
+
+MASOUD: Again no need to load all the libraries here and read the data etc
+
+MASOUD: Make sure the plots have interpretable category names
 
 ```{r}
 library(dplyr)
