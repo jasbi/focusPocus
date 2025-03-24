@@ -4,6 +4,7 @@ author: "Masoud Jasbi"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
+#Load the necessary packages
 
 ```{r packages, include=FALSE}
 library(tidyverse)
@@ -14,33 +15,65 @@ library(stringr)
 
 ```
 
-# Load Tidy Data
+# Load Tidy Data that was created at the end of data wrangling, and change the numeric values in the response column to readable values. 
 
-```{r loadTidyData}
-tidy_data <- read_csv("tidydata_toy.csv")
+``` {r}
+
+
+# Read the CSV file
+tidy_data <- read.csv("tidydata.csv", stringsAsFactors = FALSE)
+
+# Define mapping of numbers to text
+# This is the order of the cards in Qualtrics. The species of the animals varies (cat, dog, bird, elephant), but the order of the card is always the same: the first card has the first animal, the second card has the second animal, the third card has no animals, and the fourth card has both animals from the first and second cards. 
+
+mapping <- c("1" = "animal 1", "2" = "animal 2", "3" = "no animal", "4" = "both animals")
+
+# Function to replace numbers with text
+replace_numbers <- function(x) {
+  numbers <- unlist(str_extract_all(as.character(x), "\\d+"))  # Extract all numbers
+  if (length(numbers) > 0) {
+    return(paste(mapping[numbers], collapse = ", "))  # Replace and join with ", "
+  } else {
+    return(x)  # Return unchanged if no numbers found
+  }
+}
+
+# Apply the function to the response column in the tidy_data
+tidy_data$response <- sapply(tidy_data$response, replace_numbers)
+
+# Save the modified data into a csv. 
+write.csv(tidy_data, "tidydata_modified.csv", row.names = FALSE)
+
 ```
 
-Try to use the function separate() to divide a column with a complex name into more columns with names that are smaller parts of that complex name: https://tidyr.tidyverse.org/reference/separate.html
+#Plotting the data
 
 ```{r}
 #extracting the data without the "control" suffix
+#Load experimental data from the modified tidy data. 
 
-not_control_data <- tidy_data %>%
+modified_tidy_data <- read.csv("tidydata_modified.csv")
+
+experimental_data <- modified_tidy_data %>%
     filter(!grepl("^Control", question))
 
-not_control_data <- not_control_data %>%
+#separata the question names from their stress number. 
+#name example: not_and_eb_001, not_and_eb_101. The function below separates the name not_and_eb from the number. 
+#the number at the end of the name is the stress number. If the first number is zero (001), then "not"is stressed. 
+#if the first number is 1 (101), then the coordinating conjunction is stressed. 
+
+experimental_data <- experimental_data %>%
   separate(question, into = c("not", "conjunction", "animals", "stress_number"), 
            sep = "_", fill = "right")
-not_control_data <- not_control_data %>%
+experimental_data <- experimental_data %>%
   mutate(not_conjunction = paste(not, conjunction, sep = "_"))
-not_control_data <- not_control_data %>%
+experimental_data <- experimental_data %>%
   select(-not, -conjunction)
 
-#write_csv(not_control_data, "not_control_data_separated.csv"
 
-#create question groups
+#create question groups by the stress number. 
 
-not_control_data <- not_control_data %>%
+experimental_data <- experimental_data %>%
   mutate(group_combined = case_when(
     not_conjunction == "not_or" & stress_number %in% c(1, 2, 3) ~ "NOT_or",
     not_conjunction == "not_or" & stress_number %in% c(101, 102, 103) ~ "not_OR",
@@ -48,11 +81,18 @@ not_control_data <- not_control_data %>%
     not_conjunction == "not_and" & stress_number %in% c(101, 102, 103) ~ "not_AND",
     TRUE ~ not_conjunction 
   ))
+
+write_csv(tidy_data, "experimental_data.csv")
+
 # Calculate proportions
-data_summary <- not_control_data %>%
+data_summary <- experimental_data %>%
   group_by(group_combined, response) %>%
   summarize(count = n()) %>%
   mutate(proportion = count / sum(count))
+
+#write the data summary into a csv
+
+write_csv(data_summary, "data_summary.csv")
 
 # Create the stacked bar plot
 ggplot(data_summary, aes(x = group_combined, 
@@ -68,8 +108,13 @@ ggplot(data_summary, aes(x = group_combined,
 
 ```
 ```{r}
-control_data <- tidy_data %>%
+#creating the plot for the control data
+
+#filter control data from the modified tidy data
+control_data <- modified_tidy_data %>%
     filter(grepl("^Control", question))
+
+#Create the stacked bar plot for the control data
 control_plot <- control_data %>%
     group_by(question, response) %>%
     summarize(count = n(), .groups = "drop") %>%

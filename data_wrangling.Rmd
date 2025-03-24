@@ -12,8 +12,7 @@ library(tidyverse)
 ```
 
 # Loading and Inspecting the Data
-
-Here we first import the data collected on some platform (e.g. Qualtrics) into R and save it in a variable named `r raw_data`. 
+#Load the data from csv. Replace the name "toy_data.csv" with the filename.
 
 ```{r loadRawData}
 raw_data <- read_csv("toy_data.csv")
@@ -41,9 +40,7 @@ excluded_data <-
   select(-Finished, -DistributionChannel)
 ```
 
-You can add more exclusions here but you need to be very specific and justify each exclusion criterion.
-
-How many subjects were excluded and why?
+The next chunk saves the data that was excluded. 
 
 ```{r}
 exclusions <-
@@ -64,5 +61,5 @@ tidy_data <-
 Here we save the data that is reading for ploting and statistical analyses.
 
 ```{r}
-write_csv(tidy_data, "tidydata_toy.csv")
+write_csv(tidy_data, "tidydata.csv")
 ```
