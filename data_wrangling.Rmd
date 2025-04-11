@@ -15,7 +15,7 @@ library(tidyverse)
 #Load the data from csv. Replace the name "toy_data.csv" with the filename.
 
 ```{r loadRawData}
-raw_data <- read_csv("toy_data.csv")
+raw_data <- read_csv("fifty_participants.csv")
 ```
 
 # Removing Useless Columns or Rows
@@ -25,7 +25,7 @@ In the template data, we have a first row that repeats column names and a second
 ```{r}
 removed_data <- 
   raw_data[-c(1:2),] %>% #removing the first two rows
-  select(-StartDate, -EndDate, -Status, -IPAddress, -Progress, -RecordedDate, -RecipientLastName, -RecipientFirstName, -RecipientEmail, -ExternalReference, -LocationLatitude, -LocationLongitude) #removing colunns we don't need
+  select(-StartDate, -EndDate, -Status, -Progress, -RecordedDate) #removing colunns we don't need
 ```
 
 # Exclusions
@@ -53,7 +53,7 @@ exclusions <-
 ```{r}
 tidy_data <-
   excluded_data %>%
-  gather("question", "response", Control_no_animals_1:not_and_dc_102)
+  gather("question", "response", Control_noanimals_1:not_and_dc_102)
 ```
 
 # Saving the Tidy Data

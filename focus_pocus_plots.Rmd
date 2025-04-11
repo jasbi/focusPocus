@@ -108,18 +108,28 @@ ggplot(data_summary, aes(x = group_combined,
 
 ```
 ```{r}
+
+
+```
+
+```{r}
 #creating the plot for the control data
 
 #filter control data from the modified tidy data
 control_data <- modified_tidy_data %>%
     filter(grepl("^Control", question))
 
+control_data <- control_data %>%
+  separate(question, into = c("control", "name", "number"), 
+           sep = "_", fill = "right")
+
+
 #Create the stacked bar plot for the control data
 control_plot <- control_data %>%
-    group_by(question, response) %>%
+    group_by(name, response) %>%
     summarize(count = n(), .groups = "drop") %>%
     mutate(proportion = count / sum(count)) %>%
-    ggplot(aes(x = question, y = proportion, fill = as.factor(response))) +
+    ggplot(aes(x = name, y = proportion, fill = as.factor(response))) +
     geom_bar(stat = "identity", position = "dodge") +
     labs(title = "Control Questions",
          x = "Question",
