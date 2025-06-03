@@ -6,12 +6,7 @@ output: pdf_document
 ---
 #Load the necessary packages
 
-```{r packages, include=FALSE}
-library(tidyverse)
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(stringr)
+```{r packages, include=FALSE} 
 
 ```
 
@@ -21,7 +16,9 @@ library(stringr)
 
 
 # Read the CSV file
-tidy_data <- read.csv("tidydata.csv", stringsAsFactors = FALSE)
+english_tidy_data <- read.csv("english_tidydata.csv", stringsAsFactors = FALSE)
+hungarian_tidy_data <- read.csv("hungarian_tidydata.csv", stringsAsFactors = FALSE)
+hungarian2_tidy_data <- read.csv("hungarian2_tidydata.csv", stringsAsFactors = FALSE)
 
 # Define mapping of numbers to text
 # This is the order of the cards in Qualtrics. The species of the animals varies (cat, dog, bird, elephant), but the order of the card is always the same: the first card has the first animal, the second card has the second animal, the third card has no animals, and the fourth card has both animals from the first and second cards. 
@@ -39,11 +36,14 @@ replace_numbers <- function(x) {
 }
 
 # Apply the function to the response column in the tidy_data
-tidy_data$response <- sapply(tidy_data$response, replace_numbers)
+english_tidy_data$response <- sapply(english_tidy_data$response, replace_numbers)
+hungarian_tidy_data$response <- sapply(hungarian_tidy_data$response, replace_numbers)
+hungarian2_tidy_data$response <- sapply(hungarian2_tidy_data$response, replace_numbers)
 
 # Save the modified data into a csv. 
-write.csv(tidy_data, "tidydata_modified.csv", row.names = FALSE)
-
+write.csv(english_tidy_data, "english_tidydata_modified.csv", row.names = FALSE)
+write.csv(hungarian_tidy_data, "hungarian_tidydata_modified.csv", row.names = FALSE)
+write.csv(hungarian2_tidy_data, "hungarian2_tidydata_modified.csv", row.names = FALSE)
 ```
 
 #Plotting the data
@@ -51,10 +51,15 @@ write.csv(tidy_data, "tidydata_modified.csv", row.names = FALSE)
 ```{r}
 #extracting the data without the "control" suffix
 #Load experimental data from the modified tidy data. 
+english_modified_tidy_data <- read.csv("english_tidydata_modified.csv")
+hungarian_modified_tidy_data <- read.csv("hungarian_tidydata_modified.csv")
+hungarian2_modified_tidy_data <- read.csv("hungarian2_tidydata_modified.csv")
 
-modified_tidy_data <- read.csv("tidydata_modified.csv")
-
-experimental_data <- modified_tidy_data %>%
+english_experimental_data <- english_modified_tidy_data %>%
+    filter(!grepl("^Control", question))
+hungarian_experimental_data <- hungarian_modified_tidy_data %>%
+    filter(!grepl("^Control", question))
+hungarian2_experimental_data <- hungarian2_modified_tidy_data %>%
     filter(!grepl("^Control", question))
 
 #separata the question names from their stress number. 
@@ -62,40 +67,168 @@ experimental_data <- modified_tidy_data %>%
 #the number at the end of the name is the stress number. If the first number is zero (001), then "not"is stressed. 
 #if the first number is 1 (101), then the coordinating conjunction is stressed. 
 
-experimental_data <- experimental_data %>%
+english_experimental_data <- english_experimental_data %>%
   separate(question, into = c("not", "conjunction", "animals", "stress_number"), 
            sep = "_", fill = "right")
-experimental_data <- experimental_data %>%
+english_experimental_data <- english_experimental_data %>%
   mutate(not_conjunction = paste(not, conjunction, sep = "_"))
-experimental_data <- experimental_data %>%
+english_experimental_data <- english_experimental_data %>%
+  select(-not, -conjunction)
+
+hungarian_experimental_data <- hungarian_experimental_data %>%
+  separate(question, into = c("not", "conjunction", "animals", "stress_number"), 
+           sep = "_", fill = "right")
+hungarian_experimental_data <- hungarian_experimental_data %>%
+  mutate(not_conjunction = paste(not, conjunction, sep = "_"))
+hungarian_experimental_data <- hungarian_experimental_data %>%
+  select(-not, -conjunction)
+
+hungarian2_experimental_data <- hungarian2_experimental_data %>%
+  separate(question, into = c("not", "conjunction", "animals", "stress_number"), 
+           sep = "_", fill = "right")
+hungarian2_experimental_data <- hungarian2_experimental_data %>%
+  mutate(not_conjunction = paste(not, conjunction, sep = "_"))
+hungarian2_experimental_data <- hungarian2_experimental_data %>%
   select(-not, -conjunction)
 
 
 #create question groups by the stress number. 
 
-experimental_data <- experimental_data %>%
+english_experimental_data <- english_experimental_data %>%
   mutate(group_combined = case_when(
-    not_conjunction == "not_or" & stress_number %in% c(1, 2, 3) ~ "NOT_or",
+    not_conjunction == "not_or" & stress_number %in% c("001", "002", "003") ~ "NOT_or",
     not_conjunction == "not_or" & stress_number %in% c(101, 102, 103) ~ "not_OR",
-    not_conjunction == "not_and" & stress_number %in% c(1, 2, 3) ~ "NOT_and",
+    not_conjunction == "not_and" & stress_number %in% c("001", "002", "003") ~ "NOT_and",
+    not_conjunction == "not_and" & stress_number %in% c(101, 102, 103) ~ "not_AND",
+    TRUE ~ not_conjunction 
+  ))
+hungarian_experimental_data <- hungarian_experimental_data %>%
+  mutate(group_combined = case_when(
+    not_conjunction == "not_or" & stress_number %in% c("001", "002", "003") ~ "NOT_or",
+    not_conjunction == "not_or" & stress_number %in% c(101, 102, 103) ~ "not_OR",
+    not_conjunction == "not_and" & stress_number %in% c("001", "002", "003") ~ "NOT_and",
+    not_conjunction == "not_and" & stress_number %in% c(101, 102, 103) ~ "not_AND",
+    TRUE ~ not_conjunction 
+  ))
+hungarian2_experimental_data <- hungarian2_experimental_data %>%
+  mutate(group_combined = case_when(
+    not_conjunction == "not_or" & stress_number %in% c("001", "002", "003") ~ "NOT_or",
+    not_conjunction == "not_or" & stress_number %in% c(101, 102, 103) ~ "not_OR",
+    not_conjunction == "not_and" & stress_number %in% c("001", "002", "003") ~ "NOT_and",
     not_conjunction == "not_and" & stress_number %in% c(101, 102, 103) ~ "not_AND",
     TRUE ~ not_conjunction 
   ))
 
-write_csv(tidy_data, "experimental_data.csv")
+write_csv(english_experimental_data, "english_experimental_data.csv")
+write_csv(hungarian_experimental_data, "hungarian_experimental_data.csv")
+write_csv(hungarian2_experimental_data, "hungarian2_experimental_data.csv")
 
 # Calculate proportions
-data_summary <- experimental_data %>%
+english_data_summary <- english_experimental_data %>%
+  group_by(group_combined, response) %>%
+  summarize(count = n()) %>%
+  mutate(proportion = count / sum(count))
+hungarian_data_summary <- hungarian_experimental_data %>%
+  group_by(group_combined, response) %>%
+  summarize(count = n()) %>%
+  mutate(proportion = count / sum(count))
+hungarian2_data_summary <- hungarian2_experimental_data %>%
   group_by(group_combined, response) %>%
   summarize(count = n()) %>%
   mutate(proportion = count / sum(count))
 
 #write the data summary into a csv
 
-write_csv(data_summary, "data_summary.csv")
+write_csv(english_data_summary, "english_data_summary.csv")
+write_csv(hungarian_data_summary, "hungarian_data_summary.csv")
+write_csv(hungarian2_data_summary, "hungarian2_data_summary.csv")
+
+# define custom colors
+custom_colors <- c(
+  "animal 1, animal 2" = "#808080",        # Medium gray
+  "animal 1, animal 2, no animal" = "#FFD200",  # UC Davis gold
+  "animal 1, no animal" = "#94BFA2",       # Cool green
+  "animal 2" = "#2F4858",                  # Deep slate
+  "animal 2, no animal" = "#A5C8E1",       # Soft blue
+  "both animals" = "#F1F1F1",              # Pale gray
+  "no animal" = "#002855",                # UC Davis blue
+  "NA" = "#D0D0D0"                         # Light gray
+)
 
 # Create the stacked bar plot
-ggplot(data_summary, aes(x = group_combined, 
+ggplot(english_data_summary, aes(x = group_combined, 
+                         y = proportion, 
+                         fill = as.factor(response))) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = custom_colors) +
+  labs(x = "Question Group", 
+       y = "Proportion of Responses", 
+       fill = "Response") +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank()
+  )
+ggplot(hungarian_data_summary, aes(x = group_combined, 
+                         y = proportion, 
+                         fill = as.factor(response))) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = custom_colors) +
+  labs(x = "Question Group", 
+       y = "Proportion of Responses", 
+       fill = "Response") +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank()
+  )
+ggplot(hungarian2_data_summary, aes(x = group_combined, 
+                         y = proportion, 
+                         fill = as.factor(response))) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = custom_colors) +
+  labs(x = "Question Group", 
+       y = "Proportion of Responses", 
+       fill = "Response") +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank()
+  )
+
+
+# Create the stacked bar plot
+ggplot(english_data_summary, aes(x = group_combined, 
+                        y = proportion, 
+                        fill = as.factor(response))) + 
+  geom_bar(stat = "identity") +
+  labs(x = "Question Group", 
+       y = "Proportion of Responses", 
+       fill = "Response") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(hungarian_data_summary, aes(x = group_combined, 
+                        y = proportion, 
+                        fill = as.factor(response))) + 
+  geom_bar(stat = "identity") +
+  labs(x = "Question Group", 
+       y = "Proportion of Responses", 
+       fill = "Response") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(hungarian2_data_summary, aes(x = group_combined, 
                         y = proportion, 
                         fill = as.factor(response))) + 
   geom_bar(stat = "identity") +
@@ -107,25 +240,57 @@ ggplot(data_summary, aes(x = group_combined,
 
 
 ```
-```{r}
 
-
-```
 
 ```{r}
 #creating the plot for the control data
 
 #filter control data from the modified tidy data
-control_data <- modified_tidy_data %>%
+english_control_data <- english_modified_tidy_data %>%
     filter(grepl("^Control", question))
 
-control_data <- control_data %>%
+english_control_data <- english_control_data %>%
+  separate(question, into = c("control", "name", "number"), 
+           sep = "_", fill = "right")
+hungarian_control_data <- hungarian_modified_tidy_data %>%
+    filter(grepl("^Control", question))
+
+hungarian_control_data <- hungarian_control_data %>%
+  separate(question, into = c("control", "name", "number"), 
+           sep = "_", fill = "right")
+hungarian2_control_data <- hungarian2_modified_tidy_data %>%
+    filter(grepl("^Control", question))
+
+hungarian2_control_data <- hungarian2_control_data %>%
   separate(question, into = c("control", "name", "number"), 
            sep = "_", fill = "right")
 
-
 #Create the stacked bar plot for the control data
-control_plot <- control_data %>%
+english_control_plot <- english_control_data %>%
+    group_by(name, response) %>%
+    summarize(count = n(), .groups = "drop") %>%
+    mutate(proportion = count / sum(count)) %>%
+    ggplot(aes(x = name, y = proportion, fill = as.factor(response))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = "Control Questions",
+         x = "Question",
+         y = "Proportion of Responses",
+         fill = "Response") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+hungarian_control_plot <- hungarian_control_data %>%
+    group_by(name, response) %>%
+    summarize(count = n(), .groups = "drop") %>%
+    mutate(proportion = count / sum(count)) %>%
+    ggplot(aes(x = name, y = proportion, fill = as.factor(response))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = "Control Questions",
+         x = "Question",
+         y = "Proportion of Responses",
+         fill = "Response") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+hungarian2_control_plot <- hungarian2_control_data %>%
     group_by(name, response) %>%
     summarize(count = n(), .groups = "drop") %>%
     mutate(proportion = count / sum(count)) %>%
@@ -138,6 +303,68 @@ control_plot <- control_data %>%
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-print(control_plot)
+print(english_control_plot)
+print(hungarian2_control_plot)
+print(hungarian_control_plot)
 ```
+```{r}
+
+
+# Read the data
+english_df <- read.csv("english_experimental_data.csv")
+hungarian_df <- read.csv("hungarian_experimental_data.csv")
+hungarian2_df <- read.csv("hungarian2_experimental_data.csv")
+
+# Convert response to factor (required for categorical family)
+english_df$response <- as.factor(english_df$response)
+
+english_fit <- brm(
+  formula = response ~ group_combined,
+  family = categorical(),
+  data = english_df
+)
+# Read the data
+
+
+# Convert response to factor (required for categorical family)
+hungarian_df$response <- as.factor(hungarian_df$response)
+
+hungarian_fit <- brm(
+  formula = response ~ group_combined,
+  family = categorical(),
+  data = hungarian_df
+)
+# Read the data
+
+
+# Convert response to factor (required for categorical family)
+hungarian2_df$response <- as.factor(hungarian2_df$response)
+
+hungarian2_fit <- brm(
+  formula = response ~ group_combined,
+  family = categorical(),
+  data = hungarian2_df
+)
+
+
+```
+
+```{r}
+  # Posterior predictive check
+ce <- conditional_effects(english_fit, categorical = TRUE)
+plot(ce, plot = TRUE)
+
+# Posterior predictive check
+ce <- conditional_effects(hungarian_fit, categorical = TRUE)
+plot(ce, plot = TRUE)
+
+# Posterior predictive check
+ce <- conditional_effects(hungarian2_fit, categorical = TRUE)
+plot(ce, plot = TRUE)
+
+```
+#should we include "animal 1, animal 2" and 'animal 1, animal 2, no animal" into joint denial? 
+#I want to formalize the response types for easy comparison and similar coloring, but I am not sure whether to put "animal 1, animal 2" into other, or joint denial. 
+
+
 

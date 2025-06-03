@@ -1,0 +1,66 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 5.328979591836735 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "English" 
+        xmin = 0 
+        xmax = 5.328979591836735 
+        intervals: size = 13 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.7715434739066603 
+            text = "" 
+        intervals [2]:
+            xmin = 0.7715434739066603 
+            xmax = 0.9566511468391207 
+            text = "The" 
+        intervals [3]:
+            xmin = 0.9566511468391207 
+            xmax = 1.36653242261814 
+            text = "card" 
+        intervals [4]:
+            xmin = 1.36653242261814 
+            xmax = 1.5957133510107098 
+            text = "does" 
+        intervals [5]:
+            xmin = 1.5957133510107098 
+            xmax = 1.8645602093173783 
+            text = "not" 
+        intervals [6]:
+            xmin = 1.8645602093173783 
+            xmax = 2.0893338121639373 
+            text = "have" 
+        intervals [7]:
+            xmin = 2.0893338121639373 
+            xmax = 2.199516950814211 
+            text = "an" 
+        intervals [8]:
+            xmin = 2.199516950814211 
+            xmax = 2.860615782715855 
+            text = "elephant" 
+        intervals [9]:
+            xmin = 2.860615782715855 
+            xmax = 3.1074260132924687 
+            text = "" 
+        intervals [10]:
+            xmin = 3.1074260132924687 
+            xmax = 3.493892388907235 
+            text = "or " 
+        intervals [11]:
+            xmin = 3.493892388907235 
+            xmax = 3.605125893775811 
+            text = "a" 
+        intervals [12]:
+            xmin = 3.605125893775811 
+            xmax = 4.188376358434517 
+            text = "dog" 
+        intervals [13]:
+            xmin = 4.188376358434517 
+            xmax = 5.328979591836735 
+            text = "" 

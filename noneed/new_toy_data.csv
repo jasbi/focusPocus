@@ -1,0 +1,26 @@
+StartDate,EndDate,Status,Progress,Duration (in seconds),Finished,RecordedDate,ResponseId,DistributionChannel,UserLanguage,Intro,Control_noanimals_1,Control_oneanimal_2,Control_twoanimals_3,not_and_cb_001,Control_twoanimals_4,not_or_ed_001,Control_onlycat_5,not_and_dc_002,Control_twoanimals_6,not_and_ed_003,Control_hascatdog_7,not_or_cb_002,Control_onlycat_9,not_or_cb_102,not_or_cd_003,not_or_ed_101,not_and_cb_101,not_or_cd_103,Control_twoanimals_1,not_and_ed_103,Control_noanimals_10,not_and_dc_102
+Start Date,End Date,Response Type,Progress,Duration (in seconds),Finished,Recorded Date,Response ID,Distribution Channel,User Language,"Letter of Information
+
+Title of study: Language Understanding, Comprehension, and Learning in Adults
+
+Investigator: Masoud Jasbi, Ph.D, Assistant Professor of Linguistics, UC Davis
+
+Introduction and Purpose
+You are being invited to participate in a research study. If you agree to be in this research, you will see some pictures/videos or read some text and answer multiple-choice or multiple-answer questions. Alternatively you may be asked to type in your answer or complete a sentence. We will not collect any information from you that would identify you or connect you to the data collected. The anonymous data collected will be stored on an online platform and will be shared with other researchers to increase scientific openness and transparency. There are no significant risks or benefits associated with this study.
+
+
+
+Taking part in research is completely voluntary. You are free to decline to take part or stop participating in the project at any time. Whether or not you choose to take part or stop, there will be no penalty to you or loss of benefits to which you are otherwise entitled.
+
+Questions
+If you have any questions, please feel free to contact the investigator at jasbi@ucdavis.edu.
+
+By clicking on the button below you consent to the above and agree to participate in this research study.",Control_noanimals_1,Control_oneanimal_2,Control_twoanimals_3,NOT_cat_and_bird,Control_twoanimals_4,not_or_ed_001,Control_onlycat_5,NOT_dog_and_cat,Control_twoanimals_6,not_and_ed_003,Control_hascatdog_7,not_or_cb_002,Control_onlycat_9,not_or_cb_102,not_or_cd_003,not_or_ed_101,not_and_cb_101,not_or_cd_103,Control_twoanimals_1,not_and_ed_103,Control_noanimals_10,not_and_dc_102
+"{""ImportId"":""startDate"",""timeZone"":""America/Denver""}","{""ImportId"":""endDate"",""timeZone"":""America/Denver""}","{""ImportId"":""status""}","{""ImportId"":""progress""}","{""ImportId"":""duration""}","{""ImportId"":""finished""}","{""ImportId"":""recordedDate"",""timeZone"":""America/Denver""}","{""ImportId"":""_recordId""}","{""ImportId"":""distributionChannel""}","{""ImportId"":""userLanguage""}","{""ImportId"":""QID6""}","{""ImportId"":""QID2""}","{""ImportId"":""QID4""}","{""ImportId"":""QID46""}","{""ImportId"":""QID21""}","{""ImportId"":""QID45""}","{""ImportId"":""QID10""}","{""ImportId"":""QID42""}","{""ImportId"":""QID20""}","{""ImportId"":""QID47""}","{""ImportId"":""QID22""}","{""ImportId"":""QID39""}","{""ImportId"":""QID9""}","{""ImportId"":""QID48""}","{""ImportId"":""QID15""}","{""ImportId"":""QID8""}","{""ImportId"":""QID16""}","{""ImportId"":""QID27""}","{""ImportId"":""QID14""}","{""ImportId"":""QID44""}","{""ImportId"":""QID28""}","{""ImportId"":""QID43""}","{""ImportId"":""QID26""}"
+2/17/2025 10:18,2/17/2025 10:20,1,100,77,1,2/17/2025 10:20,R_1k1RpFf0KsjShG5,preview,EN,2,1,"2,3",1,,,,,,,,,,,,,,,,,,,
+2/17/2025 10:42,2/17/2025 10:45,1,100,179,1,2/17/2025 10:45,R_12nvtJpCkJDYlJu,preview,EN,2,3,"1,2",4,3,4,3,2,"1,2,3",4,3,4,3,2,"1,2,3","1,2,3","1,2,3","1,2,3",3,4,3,3,"1,2,3"
+2/17/2025 13:41,2/17/2025 13:44,0,100,181,1,2/17/2025 13:44,R_1gBJtn3uei1isPp,anonymous,EN,2,3,"1,2",4,3,4,3,2,3,4,3,4,3,2,"1,2,3",3,"1,2,3","1,2,3","1,2,3",4,"1,2,3",3,"1,2"
+2/17/2025 13:44,2/17/2025 13:47,0,100,157,1,2/17/2025 13:47,R_73EKhxpL40LNZ94,anonymous,EN,2,3,"1,2",4,3,4,3,2,3,4,3,4,3,2,"1,2,3",3,"1,2,3","1,2,3","1,2,3",4,"1,2,3",3,"1,2,3"
+2/17/2025 13:47,2/17/2025 13:50,0,100,176,1,2/17/2025 13:50,R_17EzhlQuFZ8uIFU,anonymous,EN,2,3,"1,2",4,3,4,3,2,"1,2,3",4,3,4,3,2,"1,2,3",3,"1,2,3","1,2,3","1,2,3",4,"1,2,3",3,"1,2,3"
+2/17/2025 13:51,2/17/2025 13:53,0,100,151,1,2/17/2025 13:53,R_3F8U45sZSaABavf,anonymous,EN,2,3,"1,2",4,3,4,3,2,3,4,3,4,3,2,"1,2,3",3,"1,2,3","1,2,3","1,2,3",4,"1,2,3",3,"1,2,3"
+2/17/2025 13:53,2/17/2025 13:56,0,100,140,1,2/17/2025 13:56,R_5COxM0ncYsxiIC1,anonymous,EN,2,3,"1,2",4,3,4,3,2,3,4,3,4,3,2,"1,2,3","1,2,3","1,2,3","1,2,3","1,2,3",4,"1,2,3",3,"1,2,3"

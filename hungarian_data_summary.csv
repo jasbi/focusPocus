@@ -1,0 +1,13 @@
+group_combined,response,count,proportion
+NOT_and,"animal 1, animal 2",6,0.04
+NOT_and,"animal 1, animal 2, no animal",58,0.38666666666666666
+NOT_and,no animal,86,0.5733333333333334
+NOT_or,"animal 1, animal 2",3,0.02
+NOT_or,"animal 1, animal 2, no animal",5,0.03333333333333333
+NOT_or,no animal,142,0.9466666666666667
+not_AND,"animal 1, animal 2, no animal",67,0.44666666666666666
+not_AND,no animal,83,0.5533333333333333
+not_OR,"animal 1, animal 2",3,0.02
+not_OR,"animal 1, animal 2, no animal",3,0.02
+not_OR,no animal,141,0.94
+not_OR,"no animal, both animals",3,0.02
