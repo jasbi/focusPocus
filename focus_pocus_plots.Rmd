@@ -7,6 +7,13 @@ output: pdf_document
 #Load the necessary packages
 
 ```{r packages, include=FALSE} 
+library(tidyverse)   # Includes ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr, forcats
+library(stringr)     # For str_extract_all
+library(readr)       # For read_csv and write_csv
+library(dplyr)       # For data manipulation (filter, mutate, group_by, summarize, etc.)
+library(tidyr)       # For separate
+library(ggplot2)
+library(brms)# For plotting with ggplot
 
 ```
 
@@ -240,6 +247,83 @@ ggplot(hungarian2_data_summary, aes(x = group_combined,
 
 
 ```
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Define a consistent theme for all plots
+pretty_theme <- theme_minimal(base_size = 16) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+    axis.text.y = element_text(size = 14),
+    axis.title = element_text(size = 16, face = "bold"),
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 13),
+    panel.grid.major = element_line(color = "gray85"),
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(size = 18, face = "bold", hjust = 0.5)
+  )
+
+# Define your refined color palette
+custom_colors <- c(
+  "animal 1, animal 2" = "#F6A623",       # golden poppy orange
+  "animal 1, animal 2, no animal" = "#FFD76D",  # light golden yellow
+  "animal 1, no animal" = "#D78E04",      # deep orange
+  "animal 2" = "#A65628",                # burnt sienna / earthy red
+  "animal 2, no animal" = "#D9A86C",     # desert sand
+  "both animals" = "#FBEEC1",            # poppy petal cream
+  "no animal" = "#6B8E23",               # olive green
+  "NA" = "#CFCFC4"                       # warm neutral
+)
+
+# Define a function to make the plots pretty and reusable
+make_pretty_plot <- function(data, title) {
+  ggplot(data, aes(x = group_combined, y = proportion, fill = as.factor(response))) +
+    geom_bar(stat = "identity", width = 0.7) +
+    scale_fill_manual(values = custom_colors) +
+    labs(
+      x = "Stress Condition",
+      y = "Proportion of Responses",
+      fill = "Response Type",
+      title = title
+    ) +
+    pretty_theme
+}
+
+# Now generate all three
+english_plot <- make_pretty_plot(english_data_summary, "English")
+hungarian_plot <- make_pretty_plot(hungarian_data_summary, "Hungarian 1")
+hungarian2_plot <- make_pretty_plot(hungarian2_data_summary, "Hungarian 2")
+
+# Print them (you can also use patchwork or gridExtra to combine if needed)
+print(english_plot)
+print(hungarian_plot)
+print(hungarian2_plot)
+
+```
+```{r}
+# Single group pie
+ggplot(hungarian2_data_summary, aes(x = response, y = proportion, fill = response)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(proportion, 2)), 
+            hjust = -0.1,  # shift text slightly outside the bar
+            size = 3.5) +
+  facet_wrap(~ group_combined) +
+  coord_flip() +
+  scale_fill_manual(values = custom_colors) +
+  labs(x = "Response", y = "Proportion") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(face = "bold")
+  ) +
+  expand_limits(y = 1.05)  # ensure space for the labels
+
+
+
+
+```
 
 
 ```{r}
@@ -367,4 +451,10 @@ plot(ce, plot = TRUE)
 #I want to formalize the response types for easy comparison and similar coloring, but I am not sure whether to put "animal 1, animal 2" into other, or joint denial. 
 
 
+
+```{r}
+english_fit
+hungarian_fit
+hungarian2_fit
+```
 
