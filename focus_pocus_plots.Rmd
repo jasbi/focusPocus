@@ -355,8 +355,8 @@ hungarian2_experimental_data <- clean_data(hungarian2_experimental_data)
 recode_responses <- function(df) {
   df %>%
     mutate(response_simple = case_when(
-      response == "animal 1, animal 2, no animal" ~ "NOR",
-      response == "no animal" ~ "NAND",
+      response == "animal 1, animal 2, no animal" ~ "NAND",
+      response == "no animal" ~ "NOR",
       TRUE ~ "Other"
     ))
 }
