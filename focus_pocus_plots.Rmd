@@ -69,6 +69,9 @@ hungarian_experimental_data <- hungarian_modified_tidy_data %>%
 hungarian2_experimental_data <- hungarian2_modified_tidy_data %>%
     filter(!grepl("^Control", question))
 
+#new
+
+
 #separata the question names from their stress number. 
 #name example: not_and_eb_001, not_and_eb_101. The function below separates the name not_and_eb from the number. 
 #the number at the end of the name is the stress number. If the first number is zero (001), then "not"is stressed. 
@@ -302,6 +305,135 @@ print(hungarian_plot)
 print(hungarian2_plot)
 
 ```
+
+```{r}
+library(tidyverse)
+
+# --------------------------------------------------
+# 1. Load data
+# --------------------------------------------------
+english_modified_tidy_data <- read.csv("english_tidydata_modified.csv")
+hungarian_modified_tidy_data <- read.csv("hungarian_tidydata_modified.csv")
+hungarian2_modified_tidy_data <- read.csv("hungarian2_tidydata_modified.csv")
+
+# --------------------------------------------------
+# 2. Remove Control questions
+# --------------------------------------------------
+english_experimental_data <- english_modified_tidy_data %>% 
+  filter(!grepl("^Control", question))
+hungarian_experimental_data <- hungarian_modified_tidy_data %>% 
+  filter(!grepl("^Control", question))
+hungarian2_experimental_data <- hungarian2_modified_tidy_data %>% 
+  filter(!grepl("^Control", question))
+
+# --------------------------------------------------
+# 3. Separate question components + create group labels
+# --------------------------------------------------
+clean_data <- function(df) {
+  df %>%
+    separate(question,
+             into = c("not", "conj", "animals", "stress_number"),
+             sep = "_", fill = "right") %>%
+    mutate(not_conjunction = paste(not, conj, sep = "_")) %>%
+    select(-not, -conj) %>%
+    mutate(group_combined = case_when(
+      not_conjunction == "not_or"  & stress_number %in% c("001", "002", "003") ~ "NOT_or",
+      not_conjunction == "not_or"  & stress_number %in% c("101", "102", "103") ~ "not_OR",
+      not_conjunction == "not_and" & stress_number %in% c("001", "002", "003") ~ "NOT_and",
+      not_conjunction == "not_and" & stress_number %in% c("101", "102", "103") ~ "not_AND",
+      TRUE ~ not_conjunction
+    ))
+}
+
+english_experimental_data  <- clean_data(english_experimental_data)
+hungarian_experimental_data <- clean_data(hungarian_experimental_data)
+hungarian2_experimental_data <- clean_data(hungarian2_experimental_data)
+
+# --------------------------------------------------
+# 4. Recode responses → NOR / NAND / Other
+# --------------------------------------------------
+recode_responses <- function(df) {
+  df %>%
+    mutate(response_simple = case_when(
+      response == "animal 1, animal 2, no animal" ~ "NOR",
+      response == "no animal" ~ "NAND",
+      TRUE ~ "Other"
+    ))
+}
+
+english_experimental_data  <- recode_responses(english_experimental_data)
+hungarian_experimental_data <- recode_responses(hungarian_experimental_data)
+hungarian2_experimental_data <- recode_responses(hungarian2_experimental_data)
+
+# --------------------------------------------------
+# 5. Summaries
+# --------------------------------------------------
+summarize_data <- function(df) {
+  df %>%
+    group_by(group_combined, response_simple) %>%
+    summarise(count = n()) %>%
+    mutate(proportion = count / sum(count))
+}
+
+english_summary  <- summarize_data(english_experimental_data)
+hungarian_summary <- summarize_data(hungarian_experimental_data)
+hungarian2_summary <- summarize_data(hungarian2_experimental_data)
+
+# --------------------------------------------------
+# 6. Colors for the three categories
+# --------------------------------------------------
+simple_colors <- c(
+  "NOR"  = "#FFD200",  # gold
+  "NAND" = "#002855",  # dark blue
+  "Other" = "#808080"  # grey
+)
+
+# --------------------------------------------------
+# 7. Plot function
+# --------------------------------------------------
+plot_simple <- function(df) {
+  ggplot(df, aes(x = group_combined, y = proportion,
+                 fill = response_simple)) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = simple_colors) +
+    labs(x = "Question Group",
+         y = "Proportion of Responses",
+         fill = "Response Type") +
+    theme_bw(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+# --------------------------------------------------
+# 8. Create the three plots
+# --------------------------------------------------
+plot_simple(english_summary)
+plot_simple(hungarian_summary)
+plot_simple(hungarian2_summary)
+
+
+english_summary  <- english_summary  %>% mutate(language = "English")
+hungarian_summary <- hungarian_summary %>% mutate(language = "Hungarian 1")
+hungarian2_summary <- hungarian2_summary %>% mutate(language = "Hungarian 2")
+all_summary <- bind_rows(english_summary, hungarian_summary, hungarian2_summary)
+ggplot(all_summary, aes(x = group_combined,
+                        y = proportion,
+                        fill = response_simple)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ language, nrow = 1) +   # <<--- top labels
+  scale_fill_manual(values = simple_colors) +
+  labs(x = "Question Group",
+       y = "Proportion",
+       fill = "Response Type") +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text = element_text(size = 14, face = "bold"),  # top label style
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+```
+
+
 ```{r}
 # Single group pie
 ggplot(hungarian2_data_summary, aes(x = response, y = proportion, fill = response)) +
