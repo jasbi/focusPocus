@@ -411,9 +411,9 @@ plot_simple(hungarian_summary)
 plot_simple(hungarian2_summary)
 
 
-english_summary  <- english_summary  %>% mutate(language = "English")
-hungarian_summary <- hungarian_summary %>% mutate(language = "Hungarian 1")
-hungarian2_summary <- hungarian2_summary %>% mutate(language = "Hungarian 2")
+english_summary  <- english_summary  %>% mutate(language = "English\nExperiment 1")
+hungarian_summary <- hungarian_summary %>% mutate(language = "Hungarian 1\nExperinemt 2")
+hungarian2_summary <- hungarian2_summary %>% mutate(language = "Hungarian 2\nExperiment 3")
 all_summary <- bind_rows(english_summary, hungarian_summary, hungarian2_summary)
 ggplot(all_summary, aes(x = group_combined,
                         y = proportion,
