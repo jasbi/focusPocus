@@ -20,8 +20,6 @@ library(brms)# For plotting with ggplot
 # Load Tidy Data that was created at the end of data wrangling, and change the numeric values in the response column to readable values. 
 
 ``` {r}
-
-
 # Read the CSV file
 english_tidy_data <- read.csv("english_tidydata.csv", stringsAsFactors = FALSE)
 hungarian_tidy_data <- read.csv("hungarian_tidydata.csv", stringsAsFactors = FALSE)
@@ -523,79 +521,12 @@ print(english_control_plot)
 print(hungarian2_control_plot)
 print(hungarian_control_plot)
 ```
-```{r}
-
-
-# Read the data
-english_df <- read.csv("english_experimental_data.csv")
-hungarian_df <- read.csv("hungarian_experimental_data.csv")
-hungarian2_df <- read.csv("hungarian2_experimental_data.csv")
-
-# Convert response to factor (required for categorical family)
-english_df$response <- as.factor(english_df$response)
-
-english_fit <- brm(
-  formula = response ~ group_combined,
-  family = categorical(),
-  data = english_df
-)
-# Read the data
-
-
-# Convert response to factor (required for categorical family)
-hungarian_df$response <- as.factor(hungarian_df$response)
-
-hungarian_fit <- brm(
-  formula = response ~ group_combined,
-  family = categorical(),
-  data = hungarian_df
-)
-# Read the data
-
-
-# Convert response to factor (required for categorical family)
-hungarian2_df$response <- as.factor(hungarian2_df$response)
-
-hungarian2_fit <- brm(
-  formula = response ~ group_combined,
-  family = categorical(),
-  data = hungarian2_df
-)
-
-
-```
-
-```{r}
-  # Posterior predictive check
-ce <- conditional_effects(english_fit, categorical = TRUE)
-plot(ce, plot = TRUE)
-
-# Posterior predictive check
-ce <- conditional_effects(hungarian_fit, categorical = TRUE)
-plot(ce, plot = TRUE)
-
-# Posterior predictive check
-ce <- conditional_effects(hungarian2_fit, categorical = TRUE)
-plot(ce, plot = TRUE)
-
-```
-#should we include "animal 1, animal 2" and 'animal 1, animal 2, no animal" into joint denial? 
-#I want to formalize the response types for easy comparison and similar coloring, but I am not sure whether to put "animal 1, animal 2" into other, or joint denial. 
-
-
-
-```{r}
-english_fit
-hungarian_fit
-hungarian2_fit
-```
-
 # Casey's Proposed Stats
 ## Key Question: Do we see more NAND responses to not_AND items across all three experiments?
 
 ### Proposed Solution: Three mixed effects logistic regression models on just the "and" trials.
 
-### Caveat: Depending on the data pattern, it may be necessary to separate varying and non-varying subjects due to quasi-separation. An alternate option would be more restrictive priors over by-subject random effects. The code block below plots individual variation in order to assess which if any fixes are needed.
+### Caveat: Depending on the data pattern, it may be necessary to separate varying and non-varying subjects due to quasi-separation. An alternate option would be more restrictive priors over by-subject random effects. The code block below checks individual variation in order to assess which if any fixes are needed.
 ```{r}
 e1 = english_experimental_data
 e2 = hungarian_experimental_data
@@ -666,16 +597,16 @@ table(e3_individual_means$Mean)
 
 ```
 
-# Experiment 2 BRM
+# Experiment 1 BRM
 ## Step 1: Test for intercept drift
 ## Step 2: Address if needed (Exclude non varying subjects?)
 ## Step 3: Run a full model
 ### Results: NOT_and items resulted in NAND interpretations less often than not_AND trials 95% CI[-9.46, -3.27]
 ```{r}
-# These two models display relatively large intercept drift ~.42 to ~.27. This is indicative of quasi separation, since the true mean NAND is .42
+# These two models display relatively large intercept drift ~.48 to ~.38. This is indicative of quasi separation, since the true mean NAND is .48
 Model_intercept = brm(response ~ 1,
             family = bernoulli,
-            data = e2,
+            data = e1,
             warmup = 1000,
             iter = 4000,
             chains = 4,
@@ -686,7 +617,7 @@ summary(Model_intercept)
 
 Model_random_intercept = brm(response ~ 1 + (1|ResponseId),
             family = bernoulli,
-            data = e2,
+            data = e1,
             warmup = 1000,
             iter = 4000,
             chains = 4,
@@ -700,7 +631,7 @@ e1_varying = filter(e1_individual_means, e1_individual_means$Mean != 0 & e1_indi
 e1varying_data = filter(e1, ResponseId %in% e1_varying$ResponseId)
 nrow(table(e1varying_data$ResponseId))
 
-varying_model_e2 = brm(response ~ group_combined + (group_combined|ResponseId),
+varying_model_e1 = brm(response ~ group_combined + (group_combined|ResponseId),
             family = bernoulli,
             data = e1varying_data,
             warmup = 1000,
@@ -721,28 +652,28 @@ plot(varying_model_e1)
 ## Step 3: Run a full model
 ### Results: NOT_and items did not result in NAND interpretations less often than not_AND trials 95% CI[-2.98, .92]
 ```{r}
-# These two models display relatively large intercept drift ~.52 to ~.38. This is indicative of quasi separation, since the true mean NAND is .47
-Model_intercept = brm(response ~ 1,
+# These two models display relatively large intercept drift ~.43 to ~.73. This is indicative of quasi separation, since the true mean NAND is .43
+Model_intercept_2 = brm(response ~ 1,
             family = bernoulli,
-            data = e1,
+            data = e2,
             warmup = 1000,
             iter = 4000,
             chains = 4,
             cores = 4,
             #control = list(adapt_delta = 0.95, max_treedepth = 10)
             seed = 4)
-summary(Model_intercept)
+summary(Model_intercept_2)
 
-Model_random_intercept = brm(response ~ 1 + (1|ResponseId),
+Model_random_intercept_2 = brm(response ~ 1 + (1|ResponseId),
             family = bernoulli,
-            data = e1,
+            data = e2,
             warmup = 1000,
             iter = 4000,
             chains = 4,
             cores = 4,
             #control = list(adapt_delta = 0.95, max_treedepth = 10)
             seed = 4)
-summary(Model_random_intercept)
+summary(Model_random_intercept_2)
 
 
 # Create list of subjects whose responses vary (n = 18), and sort the data to just the data from those subjects
@@ -768,10 +699,10 @@ plot(varying_model_e2)
 ## Step 1: Test for intercept drift
 ## Step 2: Address if needed (Exclude non varying subjects?)
 ## Step 3: Run a full model
-### Results: NOT_and items resulted in NAND interpretations less often than not_AND trials 95% CI[-7.31, -2.84]
+### Results: NOT_and items resulted in NAND interpretations less often than not_AND trials 95% CI[-7.36, -2.80]
 ```{r}
 # These two models do not display large intercept drift ~.55 to ~.58. This is not necessarily indicative of quasi separation, but for consistency with earlier modeling and because the data itself is still highly categorical for many subjects, I have done the same exclusion procedure.
-Model_intercept = brm(response ~ 1,
+Model_intercept_3 = brm(response ~ 1,
             family = bernoulli,
             data = e3,
             warmup = 1000,
@@ -780,21 +711,21 @@ Model_intercept = brm(response ~ 1,
             cores = 4,
             #control = list(adapt_delta = 0.95, max_treedepth = 10)
             seed = 4)
-summary(Model_intercept)
+summary(Model_intercept_3)
 
-Model_random_intercept = brm(response ~ 1 + (1|ResponseId),
+Model_random_intercept_3 = brm(response ~ 1 + (1|ResponseId),
             family = bernoulli,
             data = e3,
             warmup = 1000,
             iter = 4000,
             chains = 4,
             cores = 4,
-            #control = list(adapt_delta = 0.95, max_treedepth = 10)
+            #control = list(adapt_delta = 0.95, max_treedepth = 10),
             seed = 4)
-summary(Model_random_intercept)
+summary(Model_random_intercept_3)
 
 
-# Create list of subjects whose responses vary (n = 18), and sort the data to just the data from those subjects
+# Create list of subjects whose responses vary (n = 25), and sort the data to just the data from those subjects
 e3_varying = filter(e3_individual_means, e3_individual_means$Mean != 0 & e3_individual_means$Mean != 1)
 e3varying_data = filter(e3, ResponseId %in% e3_varying$ResponseId)
 nrow(table(e3varying_data$ResponseId))
@@ -806,7 +737,7 @@ varying_model_e3 = brm(response ~ group_combined + (group_combined|ResponseId),
             iter = 4000,
             chains = 4,
             cores = 4,
-            #control = list(adapt_delta = 0.95, max_treedepth = 10)
+            control = list(adapt_delta = 0.98, max_treedepth = 10),
             seed = 4)
 summary(varying_model_e3)
 plot(varying_model_e3)
